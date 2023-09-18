@@ -68,6 +68,12 @@ int _printf(const char *format, ...)
 
 			switch (*format)
 			{
+			case '%':
+				buffer[buffer_index++] = '%';
+				check_buffer_and_flush(buffer, &buffer_index);
+				character_count++;
+				break;
+
 			case 'c':
 				c = va_arg(args, int);
 				buffer[buffer_index++] = c;
