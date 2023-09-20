@@ -26,30 +26,20 @@ int _printf(const char *format, ...)
 		if (*format == '%')
 		{
 			format++;
-			switch (*format)
-			{
-			case '%':
+
+			if (*format == '%')
 				character_count += handle_cent(buffer, &buffer_index);
-				break;
-
-			case 'c':
+			else if (*format == 'c')
 				character_count += handle_char(buffer, &buffer_index, va_arg(args, int));
-				break;
-
-			case 's':
+			else if (*format == 's')
+			{
 				str = va_arg(args, char *);
 				character_count += handle_string(buffer, &buffer_index, str);
-				break;
-
-			case 'd':
-			case 'i':
-				character_count += handle_int(buffer, &buffer_index, va_arg(args, int));
-				break;
-
-			default:
-				character_count += handle_default(buffer, &buffer_index, *format);
-				break;
 			}
+			else if (*format == 'i' || *format == 'd')
+				character_count += handle_int(buffer, &buffer_index, va_arg(args, int));
+			else
+				character_count += handle_default(buffer, &buffer_index, *format);
 		}
 		else
 		{
