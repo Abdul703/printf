@@ -79,7 +79,9 @@ int handle_cent(char *buffer, int *buffer_index)
 int handle_string(char *buffer, int *buffer_index, char *str)
 {
 	int count = 0;
-
+	
+	if (!str)
+		str = "(null)";
 	while (*str != '\0')
 	{
 		buffer[(*buffer_index)++] = *str++;

@@ -16,7 +16,7 @@ int _printf(const char *format, ...)
 	char buffer[BUFFER_SIZE], *str;
 	int buffer_index = 0, character_count = 0;
 
-	if (!format || !format[0])
+	if (!format || !format[0] || (format[0] == '%' && !format[1]))
 		return (-1);
 
 	va_start(args, format);
