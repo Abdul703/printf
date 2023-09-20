@@ -103,6 +103,7 @@ int handle_string(char *buffer, int *buffer_index, char *str)
 int handle_int(char *buffer, int *buffer_index, int n)
 {
 	int divisor = 1, count = 0, digit;
+	unsigned int num = n;
 
 	/* handle 0 */
 	if (n == 0)
@@ -116,19 +117,19 @@ int handle_int(char *buffer, int *buffer_index, int n)
 	if (n < 0)
 	{
 		buffer[(*buffer_index)++] = '-';
-		n *= -1;
+		num *= -1;
 		count++;
 		check_buffer_and_flush(buffer, buffer_index);
 	}
 
 	/* get highest divisor */
-	while (n / divisor >= 10)
+	while (num / divisor >= 10)
 		divisor *= 10;
 
 	/* printing the numbers */
 	while (divisor > 0)
 	{
-		digit = (n / divisor) % 10;
+		digit = (num / divisor) % 10;
 		buffer[(*buffer_index)++] = (digit + '0');
 		divisor /= 10;
 		count++;
