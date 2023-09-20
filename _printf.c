@@ -22,7 +22,7 @@ int _printf(const char *format, ...)
 	int buffer_index = 0, character_count = 0;
 
 	if (!format || !format[0])
-		  return (-1);
+		return (-1);
 
 	va_start(args, format);
 
@@ -69,41 +69,44 @@ int _printf(const char *format, ...)
 		format++;
 	}
 
-	write(1, buffer, buffer_index);  // Flush any remaining characters in the buffer
+	write(1, buffer, buffer_index);
 	va_end(args);
 
-	return character_count;
+	return (character_count);
 }
 
 int handle_char(char *buffer, int *buffer_index, int c)
 {
 	buffer[(*buffer_index)++] = c;
 	check_buffer_and_flush(buffer, buffer_index);
-	return 1;
+	return (1);
 }
 
 int handle_string(char *buffer, int *buffer_index, char *str)
 {
 	int count = 0;
+
 	while (*str)
 	{
 		buffer[(*buffer_index)++] = *str++;
 		check_buffer_and_flush(buffer, buffer_index);
 		count++;
 	}
-	return count;
+	return (count);
 }
 
 int handle_int(char *buffer, int *buffer_index, int num)
 {
 	int sign = (num < 0) ? 1 : 0;
+	int num_digits, temp, i;
+
 	if (sign)
 	{
 		num = -num;
 		buffer[(*buffer_index)++] = '-';
 	}
-	int num_digits = 0;
-	int temp = num;
+	num_digits = 0;
+	temp = num;
 	do
 	{
 		temp /= 10;
@@ -111,7 +114,7 @@ int handle_int(char *buffer, int *buffer_index, int num)
 	} while (temp != 0);
 	char num_str[num_digits + 1];
 	num_str[num_digits] = '\0';
-	for (int i = num_digits - 1; i >= 0; i--)
+	for (i = num_digits - 1; i >= 0; i--)
 	{
 		num_str[i] = (num % 10) + '0';
 		num /= 10;
