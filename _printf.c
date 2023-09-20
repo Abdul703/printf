@@ -2,12 +2,10 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-/**
- * check_buffer_and_flush - Check if the buffer is full and flush it if needed.
- *
- * @buffer: Buffer array
- * @buffer_index: Current buffer index
- */
+int handle_char(char *buffer, int *buffer_index, int c);
+int handle_string(char *buffer, int *buffer_index, char *str);
+int handle_int(char *buffer, int *buffer_index, int num);
+
 void check_buffer_and_flush(char *buffer, int *buffer_index)
 {
 	if (*buffer_index == BUFFER_SIZE - 1)
@@ -17,18 +15,14 @@ void check_buffer_and_flush(char *buffer, int *buffer_index)
 	}
 }
 
-/**
- * _printf - Custom printf function that handles %, c, and s format specifiers.
- *
- * @format: String format
- *
- * Return: The number of characters printed.
- */
 int _printf(const char *format, ...)
 {
 	va_list args;
-	char buffer[BUFFER_SIZE], *str;
+	char buffer[BUFFER_SIZE];
 	int buffer_index = 0, character_count = 0;
+
+	if (!format || !format[0])
+		  return (-1);
 
 	va_start(args, format);
 
@@ -37,7 +31,6 @@ int _printf(const char *format, ...)
 		if (*format == '%')
 		{
 			format++;
-
 			switch (*format)
 			{
 				case '%':
@@ -47,19 +40,16 @@ int _printf(const char *format, ...)
 					break;
 
 				case 'c':
-					buffer[buffer_index++] = va_arg(args, int);
-					check_buffer_and_flush(buffer, &buffer_index);
-					character_count++;
+					character_count += handle_char(buffer, &buffer_index, va_arg(args, int));
 					break;
 
 				case 's':
-					str = va_arg(args, char *);
-					while (*str)
-					{
-						buffer[buffer_index++] = *str++;
-						check_buffer_and_flush(buffer, &buffer_index);
-						character_count++;
-					}
+					character_count += handle_string(buffer, &buffer_index, va_arg(args, char *));
+					break;
+
+				case 'd':
+				case 'i':
+					character_count += handle_int(buffer, &buffer_index, va_arg(args, int));
 					break;
 
 				default:
@@ -79,8 +69,52 @@ int _printf(const char *format, ...)
 		format++;
 	}
 
-	write(1, buffer, buffer_index);
+	write(1, buffer, buffer_index);  // Flush any remaining characters in the buffer
 	va_end(args);
 
-	return (character_count);
+	return character_count;
+}
+
+int handle_char(char *buffer, int *buffer_index, int c)
+{
+	buffer[(*buffer_index)++] = c;
+	check_buffer_and_flush(buffer, buffer_index);
+	return 1;
+}
+
+int handle_string(char *buffer, int *buffer_index, char *str)
+{
+	int count = 0;
+	while (*str)
+	{
+		buffer[(*buffer_index)++] = *str++;
+		check_buffer_and_flush(buffer, buffer_index);
+		count++;
+	}
+	return count;
+}
+
+int handle_int(char *buffer, int *buffer_index, int num)
+{
+	int sign = (num < 0) ? 1 : 0;
+	if (sign)
+	{
+		num = -num;
+		buffer[(*buffer_index)++] = '-';
+	}
+	int num_digits = 0;
+	int temp = num;
+	do
+	{
+		temp /= 10;
+		num_digits++;
+	} while (temp != 0);
+	char num_str[num_digits + 1];
+	num_str[num_digits] = '\0';
+	for (int i = num_digits - 1; i >= 0; i--)
+	{
+		num_str[i] = (num % 10) + '0';
+		num /= 10;
+	}
+	return (handle_string(buffer, buffer_index, num_str));
 }
